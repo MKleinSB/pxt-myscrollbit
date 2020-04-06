@@ -1,18 +1,20 @@
 {
-    "name": "pxt-myscrollbit",
-    "version": "0.0.0",
-    "description": "",
+    "name": "myscrollbit",
+    "version": "0.0.6",
+    "description": "MTKilpatrick MyScroll:Bit",
+    "license": "MIT",
     "dependencies": {
-        "core": "*",
-        "radio": "*"
+        "core": "*"
     },
     "files": [
         "README.md",
-        "main.ts"
+        "font.cpp",
+        "gamma.cpp",
+        "shims.d.ts",
+        "scrollbit.ts"
     ],
     "testFiles": [
         "test.ts"
     ],
-    "public": false,
-    "additionalFilePaths": []
+    "public": true
 }
