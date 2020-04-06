@@ -61,7 +61,7 @@ namespace myscrollbit {
         "Square",
         "SmallS",
         "Scisso",
-    
+
         "North",
         "NorthE",
         "East",
@@ -72,7 +72,7 @@ namespace myscrollbit {
         "NorthW"
     ]
 
-    let buf: Buffer = pins.createBuffer(144)	
+    let buf: Buffer = pins.createBuffer(144)
     let correct_buf: Buffer = pins.createBuffer(144)
     let frame: number = 0
 
@@ -89,13 +89,13 @@ namespace myscrollbit {
     export function scrollText(text: string, brightness: number = 128, delay: number = 50) {
         text = tokenize(text)
         let len: number = measureText(text)
-        for (let col: number = 0; col < len + COLS; col++){
+        for (let col: number = 0; col < len + COLS; col++) {
             clear()
             _drawText(text, -col + COLS, 1, brightness)
             show()
             if (delay > 0) {
                 control.waitMicros(delay * 1000)
-            }    
+            }
         }
     }
 
@@ -103,10 +103,10 @@ namespace myscrollbit {
         let result: string = ""
         let icon: string = ""
 
-        for (let x = 0; x < text.length; x++){
+        for (let x = 0; x < text.length; x++) {
             let char: string = text.charAt(x)
             if (char == "}" && icon.length > 0) {
-                let index: number = ICONS.indexOf(icon.substr(1,6))
+                let index: number = ICONS.indexOf(icon.substr(1, 6))
                 icon += char
 
                 if (index > -1) {
@@ -198,8 +198,8 @@ namespace myscrollbit {
     //% row.min=0 row.max=6
     //% brightness.min=0 brightness.max=255 brightness.defl=128
     export function setPixel(col: number, row: number, brightness: number = 128): void {
-        if(col < 0 || row < 0 || col >= COLS || row >= ROWS){return}
-        if (UPSIDE_DOWN) {col = (COLS - 1) - col; row = (ROWS - 1) - row}
+        if (col < 0 || row < 0 || col >= COLS || row >= ROWS) { return }
+        if (UPSIDE_DOWN) { col = (COLS - 1) - col; row = (ROWS - 1) - row }
         buf[pixelAddr(col, row)] = Math.clamp(0, 255, brightness)
         correct_buf[pixelAddr(col, row)] = correctGamma(Math.clamp(0, 255, brightness))
     }
@@ -222,7 +222,7 @@ namespace myscrollbit {
     //% blockId=myscrollbit_show
     //% block="display your changes"
     export function show(): void {
-        
+
         smbus.writeByte(I2C_ADDR, REG_BANK, frame)
         smbus.writeBuffer(I2C_ADDR, REG_COLOR, correct_buf)
         smbus.writeByte(I2C_ADDR, REG_BANK, BANK_CONFIG)
@@ -239,7 +239,7 @@ namespace myscrollbit {
     //% block="clear scroll:bit"
     //% icon=""
     export function clear(): void {
-		correct_buf.fill(0)
+        correct_buf.fill(0)
         buf.fill(0)
     }
 
@@ -299,7 +299,7 @@ namespace myscrollbit {
     //% advanced color=#554444
     export function measureText(text: string): number {
         let len: number = 0
-        for (let x: number = 0; x < text.length; x++){
+        for (let x: number = 0; x < text.length; x++) {
             len += charWidth(text.charAt(x)) + 1
         }
         return len
@@ -350,8 +350,8 @@ namespace myscrollbit {
     }
     export function _drawText(text: string, col: number, row: number, brightness: number = 128): void {
         let offset_col: number = 0
-        for (let x: number = 0; x < text.length; x++){
-            let width:  number = charWidth(text.charAt(x))
+        for (let x: number = 0; x < text.length; x++) {
+            let width: number = charWidth(text.charAt(x))
             if (col + offset_col >= COLS) {
                 return
             }
