@@ -342,6 +342,6 @@ SOFTWARE.
 * for PXT/microbit
 
 ```package
-scrollbit=github:MTKilpatrick/pxt-scrollbit
+myscrollbit=github:MTKilpatrick/pxt-myscrollbit
 ```
  
