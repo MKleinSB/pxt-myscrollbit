@@ -1,102 +1,223 @@
-# myscroll:bit
+## myscroll:bit
 
+This driver suite for the **Pimoroni scroll:bit** 17x7 LED display replaces the original driver.
+A greater range of pixel, line, image, text and display manipulation functions are provided.
+Basic pixel functions are also faster but individual pixel brightness, an expensive overhead, has been dispensed with.
  
+Most operations are dependent on the draw mode as set by `setDrawMode()` and the use of a buffer (array) to store the
+intended state of the **scroll:bit** display. In the `Off` drawing mode any changes to pixels
+occur only in the buffer until such time as the buffer is sent to the LED matric by a `show()` command.
+In the `On` drawing mode the LED matrix is updated with every single operation. This can be slower than
+performing a single `show()` after several partial image changes.
 
-### Light a single pixel
+### `setPixel()` - set a pixel on/off
 
-Light a single pixel on scroll:bit. Note, you must call `show` to display your changes.
+Light or clear a single pixel with an x-coordinate and y-coordinate. The top-left corner is (0,0).
+The brightness of the pixel is defined by the global brightness - see `setAllBrightness()`.
 
-* `col` is the column, from 0-16
-* `row` is the row, from 0-6
-* `brightness` is the brightness, from 0-255
+Lighting a pixel with `setPixel(x, y, true)` does not have any effect on the blink status of a pixel.
+If the draw mode is set to `Off` the LED matrix will not be updated until a call to `show()`.
+Clearing a pixel with `setPixel(x, y, false)` also clears the blink state of the pixel.
+
+In `On` draw mode the necessary column of the LED matrix will be updated immediately,
+including any other pixels in that column which were changed since the last display update.
+
+
+* `x` - the column, from 0-17
+* `y` - the row, from 0-7
+* `state` - on/off (boolean)
+
+Note that column (x = 17) exists to the far right in the pixel buffer and may be set, but it is not visible.
+Likewise pixels in row (y = 7) existsin the buffer but are not visible off the bottom of the LED display.
 
 ```
-myscrollbit.setPixel(col: number, row:number, brightness: number)
+myscrollbit.setPixel(x: number, y: number, state: boolean)
 ```
 
 For example:
 
 ```
-myscrollbit.setPixel(5, 5, 255)
+myscrollbit.setPixel(5, 5, true)
 ```
 
-### Display your changes
 
-When you've finished setting pixels and drawing text, you must call `show` to display your changes.
+### `blinkPixel()` - blink or unblink a pixel
+
+The blink frequency and blink enable for all pixels are globally determined - see `setBlinkMode()`.
+Setting a pixel to blink using `blinkPixel()` with blink mode disabled will have no effect.
+In the `Off` draw mode a `show()` is required to update the LED matrix.
+A call to `blinkPixel()` does not light the pixel - a call to `setPixel()` is also required.
+It follows that the blink status may be repeatedly altered with the pixel remaining in the lit state.
+
+
+* `x` is the column, from 0-17
+* `y` is the row, from 0-7
+* `blink`  - on/off blink status (boolean)
 
 ```
-myscrollbit.show()
+myscrollbit.blinkPixel(x: number, y: number, blink: boolean)
 ```
 
-### Clear the display
+For example:
 
-To clear the display, you can call `clear`, you must also call `show` if you want to display your changes.
+```
+myscrollbit.setPixel(2, 6, true)
+myscrollbit.blinkPixel(2, 6, true)
+```
+
+### `plotLine()`  - plot/unplot a line
+
+A line-drawing function which will plot or unplot a line between two given points (x0,y0) and (x1,y1).
+The Bresenham algorithm is modified to ensure symmetry of lines drawn on a small display.
+In the `Off` draw mode a `show()` is required to update the LED matrix.
+In `On` draw mode all affected columns of the LED matrix will be updated immediately but for a line of
+more than a couple of pixels this operation will be slower than using `Off` mode followed by `show()` 
+
+* `x0` is the column, from 0-17
+* `y0` is the row, from 0-7
+* `x1` is the column, from 0-17
+* `y1` is the row, from 0-7
+* `state` - on/off (boolean)
+
+```
+myscrollbit.plotLine(x0: number, y0: number, x1: number, y1: number, state: boolean)
+```
+
+For example:
+
+```
+myscrollbit.plotLine(2, 6, 16, 0, true)
+```
+
+### `isPixel()` - is a pixel set?
+
+Return a boolean true/false for the lit state of a pixel independent of its blink status.
+The status of the pixel is determined by the pixel buffer, not the physical state of the LED matrix and so
+is independent of the draw mode and independent of whether a `show()` has been issued. Furthermore, column (x = 17) and
+row (y = 7) pixels may be quiered from the buffer even though they have no physical LED in the matrix.
+
+* `x` is the column, from 0-17
+* `y` is the row, from 0-7
+
+```
+myscrollbit.isPixel(x: number, y: number)
+```
+
+For example:
+
+```
+if (myscrollbit.isPixel(5, 5)) {
+    doSomething()
+}
+```
+
+### `clear()` - clear the display buffer(s)
+
+Clear the contents of the pixel buffer and the blink buffer. In the `On` draw mode this will clear the LED matrix
+immediately but in `Off` draw mode a call to `show()` is required to update the LED display.
 
 ```
 myscrollbit.clear()
+```
+
+
+### `show()` - update the Scroll:bit display 
+
+The entire LED matrix is updated by transferring all 18 bytes of the pixel buffer to the **scroll:bit** display.
+If the blink mode is enabled - see `setBlinkMode()` - the blink buffer will also be transferred.
+Updating the display is therefore quicker when blink mode is disabled.
+
+
+```
 myscrollbit.show()
 ```
 
-### Display a text string
+### `scrollDisplay()` - scroll the whole image pixel-wise
 
-To show a string of text on scroll:bit you should use `drawText`:
+The display buffer is shifted left, right, up or down a single pixel.
+The LED display is not updated unless the draw mode is set to `On`.
+The behaviours of the four directional shifts are a little different:
+`Left` - brings invisible column 17 into view on the right of the display buffer. Data from column 0 will be lost.
+`Right` - places a column of zeros in the left of the buffer. Column 16 will be preserved in column 17 of the buffer.
+`Up` - brings invisible row 0 into view at the bottom of the display buffer. Data from row 0 will be lost.
+`Down` - places a row of zeros in the top of the buffer and preserves data from row 6 in the invisible row 7.
 
-* `col` is the column, from 0-16
-* `row` is the row, from 0-6
-* `text` is the text you want to show
-* `brightness` is the brightness, from 0-255
-
-```
-myscrollbit.drawText(col: number, row:number, text: string, brightness: number)
-```
-
-For example:
+* `direction` is the direction: Right, Down, Left, Up [0-3]
 
 ```
-myscrollbit.drawText(0, 1, "Hello World", 128)
-```
-
-### Scroll a text string across the display
-
-Since a long string of text wont fit on scroll:bit, you have to scroll it across the display.
-
-You can do this manually with `drawText` and `measureText` but we've included a convinient function for you:
-
-* `text` is the text you want to show
-* `brightness` is the brightness, from 0-255
-* `delay` (optional) is the time, in milliseconds, to delay each scroll step - a bigger number equals slower scrolling
-
-```
-myscrollbit.scrollText(text: string, brightness: number, delay: number=50)
+myscrollbit.scrollDisplay(directions: Directions)
 ```
 
 For example:
 
 ```
-myscrollbit.scrollText("The quick brown fox jumped over the lazy dog!", 128)
+myscrollbit.scrollDisplay(Directions.Left)
+myscrollbit.scrollDisplay(1) // down
 ```
 
-Scrolling text is always vertically centered, starts off the right edge of the display, and scrolls across until it's gone.
+### `scrollText()` - scroll text across
 
-### Draw a single character
+The text scrolling function is enhanced by the facility to preserve any image already displayed on the **scroll:bit**
+and/or existing in the display buffer.
+This is achieved by using a different frame of the driver IC - see `setWriteFrame()` and `setDisplayFrame()` for further details
+on the frames.
 
-If you just want to draw a single lett, you can use `drawChar`:
+After the LED matrix is cleared, a text string is scrolled from right to left at a controllable speed.
+When the scroll is complete the display and the display buffer are restored to their previous state allowing
+other graphical displays to continue without additional retorative commands.
 
-* `col` is the column, from 0-16
-* `row` is the row, from 0-6
-* `char` is the text you want to show
-* `brightness` is the brightness, from 0-255
+
+* `text` - the text to display
+* `delay` (optional) - the time (ms) delay for each scroll step
+* `y` (optional) - the vertical offset [0-2] of the bottom of the text from the bottom of the screen, row 6)
+* 
 
 ```
-myscrollbit.drawChar(col: number, row: number, char: string, brightness: number)
+myscrollbit.scrollText(text: string, delay: number = 50, y: number = 1)
 ```
 
 For example:
 
 ```
-myscrollbit.drawChar(1, 1, 'H', 128)
-myscrollbit.drawChar(7, 1, 'a', 128)
-myscrollbit.drawChar(12,1, 'i', 128)
+myscrollbit.scrollText("The quick brown fox jumps over the lazy dog!", 128, 0)
+```
+
+### `drawText()` - draw text
+
+Show a string of text on scroll:bit at a given position (x,y) without scrolling. The text may contain Micro:bit
+icons by name, enclosed within `{}` parentheses.
+
+* `text` is the text to display
+* `x` is the column, from 0-17
+* `y` is the row, from 0-7
+
+```
+myscrollbit.drawText(text: string, x: number, y: number)
+```
+
+For example:
+
+```
+myscrollbit.drawText("Hello World", 0, 1)
+myscrollbit.drawText("Hello {Happy} World", 0, 1)
+```
+
+### `drawChar` - draw a single character
+
+Display a single text character at a given position.
+
+* `char` is the character to display
+* `x` is the column, from 0-17
+* `y` is the row, from 0-7
+
+```
+myscrollbit.drawChar(text: string, x: number, y: number)
+```
+
+For example:
+
+```
+myscrollbit.drawChar('H', 3,3)
 ```
 
 ### Measure a text string
@@ -174,6 +295,28 @@ Here's a list of icons you can use:
 
 MIT License
 
+
+Copyright (c) 2020 Michael Kilpatrick
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+This software is an almost
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
 Copyright (c) 2018 Pimoroni Ltd.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -199,5 +342,6 @@ SOFTWARE.
 * for PXT/microbit
 
 ```package
-myscrollbit=github:MTKilpatrick/pxt-myscrollbit
+scrollbit=github:MTKilpatrick/pxt-scrollbit
 ```
+ 

@@ -14,6 +14,7 @@ namespace myscrollbit {
         MicroBitFont font = MicroBitFont::getSystemFont();
         return (char)*(font.characters + index);
     }
+
     //%
     int getCharWidth(int charCode) {
         if(charCode < MICROBIT_FONT_ASCII_START || charCode > MICROBIT_FONT_ASCII_END){
@@ -32,14 +33,14 @@ namespace myscrollbit {
         if (width & 4) { return 3; }
         return 2;
     }
+
     //%
     Buffer getFontData(int charCode) {
         if(charCode < MICROBIT_FONT_ASCII_START || charCode > MICROBIT_FONT_ASCII_END){
             return PXT_CREATE_BUFFER(NULL, 5);
         }
-        MicroBitFont font = MicroBitFont::getSystemFont();
+        MicroBitFont font = MicroBitFont::getSystemFont(); 
         int offset = (charCode - MICROBIT_FONT_ASCII_START) * 5;
-
         return PXT_CREATE_BUFFER((uint8_t *)(font.characters + offset), 5);
     }
 }
