@@ -60,7 +60,7 @@ myscrollbit.blinkPixel(x: number, y: number, blink: boolean)
 
 For example:
 
-```
+```blocks
 myscrollbit.setPixel(2, 6, true)
 myscrollbit.blinkPixel(2, 6, true)
 ```
