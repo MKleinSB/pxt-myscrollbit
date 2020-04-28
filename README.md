@@ -30,7 +30,7 @@ including any other pixels in that column which were changed since the last disp
 Note that column (x = 17) exists to the far right in the pixel buffer and may be set, but it is not visible.
 Likewise pixels in row (y = 7) existsin the buffer but are not visible off the bottom of the LED display.
 
-```
+```typescript
 myscrollbit.setPixel(x: number, y: number, state: boolean)
 ```
 
