@@ -61,6 +61,8 @@ myscrollbit.blinkPixel(x: number, y: number, blink: boolean)
 For example:
 
 ```typescript
+=======
+```blocks
 myscrollbit.setPixel(2, 6, true)
 myscrollbit.blinkPixel(2, 6, true)
 ```
@@ -346,3 +348,4 @@ myscrollbit=github:MTKilpatrick/pxt-myscrollbit
 ```
 <script src="https://makecode.com/gh-pages-embed.js"></script><script>makeCodeRender("{{ site.makecode.home_url }}", "{{ site.github.owner_name }}/{{ site.github.repository_name }}");</script>
  
+=======
