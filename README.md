@@ -30,13 +30,13 @@ including any other pixels in that column which were changed since the last disp
 Note that column (x = 17) exists to the far right in the pixel buffer and may be set, but it is not visible.
 Likewise pixels in row (y = 7) existsin the buffer but are not visible off the bottom of the LED display.
 
-```
+```typescript
 myscrollbit.setPixel(x: number, y: number, state: boolean)
 ```
 
 For example:
 
-```
+```blocks
 myscrollbit.setPixel(5, 5, true)
 ```
 
@@ -54,13 +54,13 @@ It follows that the blink status may be repeatedly altered with the pixel remain
 * `y` is the row, from 0-7
 * `blink`  - on/off blink status (boolean)
 
-```
+```typescript
 myscrollbit.blinkPixel(x: number, y: number, blink: boolean)
 ```
 
 For example:
 
-```
+```typescript
 myscrollbit.setPixel(2, 6, true)
 myscrollbit.blinkPixel(2, 6, true)
 ```
@@ -79,13 +79,13 @@ more than a couple of pixels this operation will be slower than using `Off` mode
 * `y1` is the row, from 0-7
 * `state` - on/off (boolean)
 
-```
+```typescript
 myscrollbit.plotLine(x0: number, y0: number, x1: number, y1: number, state: boolean)
 ```
 
 For example:
 
-```
+```typescript
 myscrollbit.plotLine(2, 6, 16, 0, true)
 ```
 
@@ -99,13 +99,13 @@ row (y = 7) pixels may be quiered from the buffer even though they have no physi
 * `x` is the column, from 0-17
 * `y` is the row, from 0-7
 
-```
+```typescript
 myscrollbit.isPixel(x: number, y: number)
 ```
 
 For example:
 
-```
+```blocks
 if (myscrollbit.isPixel(5, 5)) {
     doSomething()
 }
@@ -144,15 +144,15 @@ The behaviours of the four directional shifts are a little different:
 
 * `direction` is the direction: Right, Down, Left, Up [0-3]
 
-```
-myscrollbit.scrollDisplay(directions: Directions)
+```typescript
+myscrollbit.scrollDisplay(direction: number)
 ```
 
 For example:
 
-```
-myscrollbit.scrollDisplay(Directions.Left)
-myscrollbit.scrollDisplay(1) // down
+```blocks
+myscrollbit.scrollDisplay(Scrolls.Left)
+myscrollbit.scrollDisplay(1)
 ```
 
 ### `scrollText()` - scroll text across
@@ -344,4 +344,5 @@ SOFTWARE.
 ```package
 myscrollbit=github:MTKilpatrick/pxt-myscrollbit
 ```
+<script src="https://makecode.com/gh-pages-embed.js"></script><script>makeCodeRender("{{ site.makecode.home_url }}", "{{ site.github.owner_name }}/{{ site.github.repository_name }}");</script>
  

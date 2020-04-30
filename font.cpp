@@ -27,11 +27,17 @@ namespace myscrollbit {
         | (uint8_t)*(font.characters + offset + 2)
         | (uint8_t)*(font.characters + offset + 3)
         | (uint8_t)*(font.characters + offset + 4);
-
-        if (width & 1) { return 5; }
-        if (width & 2) { return 4; }
-        if (width & 4) { return 3; }
-        return 2;
+        if (width & 16) {
+            if (width & 1) { return 5; }
+            if (width & 2) { return 4; }
+            if (width & 4) { return 3; }
+            return 2;
+        }
+        if (width & 1) { return 4; }
+        if (width & 2) { return 3; }
+        if (width & 4) { return 2; }
+        if (width & 8) { return 1; }
+        return 3;       
     }
 
     //%
